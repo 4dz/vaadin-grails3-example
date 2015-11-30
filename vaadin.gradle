@@ -1,0 +1,126 @@
+import org.yaml.snakeyaml.Yaml
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'org.yaml:snakeyaml:1.16'
+    }
+}
+
+ext {
+    vaadinConfig = Yaml.newInstance().load(file("grails-app/conf/vaadin.yml").newReader())
+    // gradle -PgrailsEnv=<environment name> <task name>
+    productionMode = project.hasProperty('grailsEnv') && project.grailsEnv == 'prod'
+}
+
+task compileVaadinWidgetsets << {
+    println "Compiling vaadin widgetsets"
+    vaadinConfig.mappings.findAll { it.containsKey('widgetset') }.eachWithIndex { mapping, index ->
+        def widgetset = mapping['widgetset']
+        def task = tasks.create(
+                name: "compileVaadinWidgetset${index}",
+                type: JavaExec) {
+
+
+            classpath {
+                [
+                        sourceSets.main.java.srcDirs,
+                        sourceSets.main.groovy.srcDirs,
+                        sourceSets.main.output.resourcesDir,
+                        sourceSets.main.output.classesDir,
+                        sourceSets.main.compileClasspath,
+                ]
+            }
+
+            maxHeapSize = '1024M'
+            main = 'com.google.gwt.dev.Compiler'
+            jvmArgs = ["-Xss1024k", "-Djava.awt.headless=true"]
+            args = [
+                    widgetset,
+                    '-war', "src/main/webapp/VAADIN/widgetsets",
+                    '-logLevel', 'ALL',
+                    '-localWorkers', '3',
+                    '-draftCompile'
+            ]
+
+        }
+        logger.debug("Created task with name {}", task.name)
+        logger.debug("Executing task [{}]", task.name)
+        task.execute()
+        tasks.remove(task)
+        logger.debug("Removed task [{}]", task.name)
+    }
+}
+
+task compileVaadinThemes << {
+
+    println "Compiling Vaadin themes"
+    def tmpDir = getTemporaryDir() as File
+
+    def themeRelease = "7.5.6"
+    def themesJarName = "vaadin-themes-${themeRelease}.jar"
+    def releaseSrc = "http://vaadin.com/download/release/7.5/$themeRelease/${themesJarName}"
+
+    ant.get(src: releaseSrc, dest: "$tmpDir/$themesJarName", skipexisting: 'true')
+    ant.unzip(src: "$tmpDir/$themesJarName", dest: "$tmpDir/$themeRelease", overwrite: 'false')
+
+    copy {
+        from "$tmpDir/$themeRelease/VAADIN/themes/valo"
+        into 'src/main/webapp/VAADIN/themes/valo'
+    }
+
+    def themesDir = file('src/main/webapp/VAADIN/themes')
+    def themeDirList = themesDir.listFiles().findAll { themeDirCandiate ->
+        themeDirCandiate.isDirectory() &&
+                themeDirCandiate.listFiles().find { file ->
+                    file.name == 'styles.scss'
+                }
+    }
+
+    themeDirList.eachWithIndex { themeDir, index ->
+        def themeName = themeDir.name
+        def task = tasks.create(
+                name: "compileScss${index}",
+                type: JavaExec) {
+
+            classpath {
+                [
+                        sourceSets.main.java.srcDirs,
+                        sourceSets.main.groovy.srcDirs,
+                        sourceSets.main.output.resourcesDir,
+                        sourceSets.main.output.classesDir,
+                        sourceSets.main.compileClasspath,
+                ]
+            }
+
+            maxHeapSize = '1024M'
+            main = 'com.vaadin.sass.SassCompiler'
+            jvmArgs = ["-Xss1024k", "-Djava.awt.headless=true"]
+            args = [
+                    "src/main/webapp/VAADIN/themes/$themeName/styles.scss",
+                    "src/main/webapp/VAADIN/themes/$themeName/styles.css"
+            ]
+
+        }
+        logger.debug("Created task with name {}", task.name)
+        logger.debug("Executing task [{}]", task.name)
+        task.execute()
+        tasks.remove(task)
+        logger.debug("Removed task [{}]", task.name)
+    }
+}
+
+classes << {
+    if (productionMode) {
+        compileVaadinWidgetsets.execute()
+    }
+}
+
+war << {
+    if (productionMode) {
+        compileVaadinThemes.execute()
+    }
+}
+
