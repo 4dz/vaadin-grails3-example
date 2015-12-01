@@ -8,8 +8,9 @@ If you have SDKMAN (the latest version of GVM) installed you can switch between 
     sdk default grails 3.0.9
     sdk default groovy 2.4.5
 
-## Getting Started
-This project was created within IntelliJ Idea.  Some instructions are available [on github](https://github.com/vaadin-for-grails/grails3-vaadin7-plugin).
+## Getting Started with Vaadin for Grails 3
+This project was created within IntelliJ Idea.  Some instructions are available 
+[on github](https://github.com/vaadin-for-grails/grails3-vaadin7-plugin) and within the [documentation](https://github.com/vaadin-for-grails/organization/wiki) 
 The following instructions may be useful if starting a new project.
 
 1. Install Grails 3 and Groovy 2.4.5
@@ -33,6 +34,30 @@ The following instructions may be useful if starting a new project.
    have probably added the maven url to the wrong 'repositories { ... }' section in build.gradle.
 
 6. Run the gradle build
+
+7. If you want to use conf/vaadin.yml to list out the views and navigation then your root url must include a
+   hash-bang #! or else it will fail 'Trying to navigate to an unknown state'. (I think this is a bug in the plugin).
+   For example,
+   ```
+   mappings:
+   
+   - uri: '/vaadin#!'
+     theme: 'grails'
+     pageTitle: 'Vaadin for Grails 3'
+     view: 'app.views.StartView'
+    ```
+    
+    You can implement your own Vaadin UI, as per the Grails 2 plugin example if you prefer.
+
+## Running this project
+Vaadin for Grails 3 runs Vaadin alongside Grails.  If you access the root of the application you will reach Grails 
+content; if you access paths which are mapped to Vaadin, you will get Vaadin content.
+
+So when this project runs if you go to http://localhost:8080 you will get a Grails/GSP page; the vaadin aspect of the
+application is at http://localhost:8080/vaadin
+
+## Navigator
+If using the conf/vaadin.yml mappings, there is no need to use the Navigator directly - unlike the Grails 2 example.
 
 ## References
 * [Vaadin For Grails Documentation](https://github.com/vaadin-for-grails/organization/wiki)

@@ -3,13 +3,10 @@ closeIdleSessions: true
 
 mappings:
 
-- uri: '/vaadin'
+- uri: '/vaadin#!'
   theme: 'grails'
-  pageTitle: 'Vaadin for Grails'
-#  ui: 'app.YourUI'
-#  widgetset: 'app.YourWidgetset'
-  view: 'app.IndexView'
+  pageTitle: 'Vaadin for Grails 3'
+  view: 'app.views.StartView'
 
-#- uri: '/vaadin#!another'
-#  view: 'app.AnotherView'
-
+- uri: '/vaadin#!main'
+  view: 'app.views.MainView'
