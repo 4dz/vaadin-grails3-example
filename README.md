@@ -80,7 +80,8 @@ Static assets which are not handled by the Asset Pipeline can be placed in src/m
 
     pic.source = new ExternalResource("/cat-128px.png")
 
-Its not yet clear how to access assets in the asset pipeline as there is no r
+Its not yet clear how to access assets in the asset pipeline as there is no runtime I can get
+working!
 
 ## References
 * [Vaadin For Grails Documentation](https://github.com/vaadin-for-grails/organization/wiki)
