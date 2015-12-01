@@ -52,8 +52,10 @@ class MainView extends VerticalLayout implements View {
 
     @Override
     void enter(ViewChangeListener.ViewChangeEvent event) {
-        def parameter = event.viewName.tokenize("/").last()
-        equalPanel.content = parameter ?
-                new AnimalViewer(parameter) : new Label("Nothing to see here, just pass along.")
+        def parameters = event.viewName.tokenize("/")
+        parameters.remove 0
+
+        equalPanel.content = parameters ?
+                new AnimalViewer(parameters.last()) : new Label("Nothing to see here, just pass along.")
     }
 }
