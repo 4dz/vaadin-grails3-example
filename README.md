@@ -59,6 +59,29 @@ application is at http://localhost:8080/vaadin
 ## Navigator
 If using the conf/vaadin.yml mappings, there is no need to use the Navigator directly - unlike the Grails 2 example.
 
+## Declarative Design
+Vaadin for Grails 3 can use declarative design, but you have to put the design HTML files on the classpath.
+I have only been able to get this to work by placing the images in grails/conf/.  However it should be possible to 
+add custom gradle build tasks to store the files elsewhere.  
+In this project they are hosted in grails-app/conf/app/views.
+
+## Static Content
+In the original example in the [Book of Vaadin](https://vaadin.com/book/), it contains cartoon pictures of various
+animals which are served as images.  In the example, these images are part of the Vaadin 'reindeer' theme; however,
+these images are not present in the theme - at least, not in Vaadin v7.5.
+
+![cat-128px.png](src/main/resources/public/cat-128px.png)
+![dog-128px.png](src/main/resources/public/dog-128px.png)
+![penguin-128px.png](src/main/resources/public/penguin-128px.png)
+![pig-128px.png](src/main/resources/public/pig-128px.png)
+![reindeer-128px.png](src/main/resources/public/reindeer-128px.png)
+
+Static assets which are not handled by the Asset Pipeline can be placed in src/main/resources/public and accessed with,
+
+    pic.source = new ExternalResource("/cat-128px.png")
+
+Its not yet clear how to access assets in the asset pipeline as there is no r
+
 ## References
 * [Vaadin For Grails Documentation](https://github.com/vaadin-for-grails/organization/wiki)
 * [Vaadin For Grails 3 plugin](https://github.com/vaadin-for-grails/grails3-vaadin7-plugin)

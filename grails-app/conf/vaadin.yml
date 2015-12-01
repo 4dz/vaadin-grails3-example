@@ -10,3 +10,6 @@ mappings:
 
 - uri: '/vaadin#!main'
   view: 'app.views.MainView'
+
+- uri: '/vaadin#!main/{animal}'
+  view: 'app.views.MainView'
